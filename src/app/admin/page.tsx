@@ -24,7 +24,7 @@ interface Appointment {
 }
 
 const pkgPrices: Record<string, number> = {
-  standard: 100, deluxe: 120, premium: 150, "cars-package": 200, "cars package": 200,
+  standard: 100, deluxe: 150, premium: 200, "cars-package": 400, "cars package": 400,
 };
 
 export default function AdminPage() {
