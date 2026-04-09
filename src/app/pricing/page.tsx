@@ -8,9 +8,9 @@ import { Check, Car, Crown, ArrowRight } from "lucide-react";
 
 const packages = [
   { name: "Standard", price: 100, popular: false, features: ["Up to 1 hour of shooting", "1 location of your choice (within 25 miles)", "10\u201315 edited photos", "Delivery via online gallery (5\u20137 business days)", "Great for portraits, birthdays, or casual shoots"] },
-  { name: "Deluxe", price: 120, popular: true, features: ["Up to 2 hours of shooting", "Up to 2 locations (within 25 miles)", "20\u201325 edited photos", "Posing guidance & creative direction", "Ideal for couples, fashion, or professional portraits"] },
-  { name: "Premium", price: 150, popular: false, features: ["Up to 3 hours of shooting", "Multiple locations of your choice", "30\u201340 edited photos", "Outfit changes, props & concept planning", "Priority editing (3\u20134 business days)", "Perfect for brand shoots, music artists, or cinematic portraits"] },
-  { name: "Cars Package", price: 200, popular: false, icon: Car, features: ["Multiple locations of your choice", "Car of your choosing from our fleet", "50\u201370 edited photos", "Outfit changes, props & concept planning", "Priority editing (3\u20134 business days)", "Perfect for brand shoots, music artists, or cinematic portraits"] },
+  { name: "Deluxe", price: 150, popular: true, features: ["Up to 2 hours of shooting", "Up to 2 locations (within 25 miles)", "20\u201325 edited photos", "Posing guidance & creative direction", "Ideal for couples, fashion, or professional portraits"] },
+  { name: "Premium", price: 200, popular: false, features: ["Up to 3 hours of shooting", "Multiple locations of your choice", "30\u201340 edited photos", "Outfit changes, props & concept planning", "Priority editing (3\u20134 business days)", "Perfect for brand shoots, music artists, or cinematic portraits"] },
+  { name: "Cars Package", price: based off car, popular: false, icon: Car, features: ["Multiple locations of your choice", "Car of your choosing from our fleet", "50\u201370 edited photos", "Outfit changes, props & concept planning", "Priority editing (3\u20134 business days)", "Perfect for brand shoots, music artists, or cinematic portraits"] },
 ];
 
 const vehicles = [
