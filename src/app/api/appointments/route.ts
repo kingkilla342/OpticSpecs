@@ -75,7 +75,7 @@ async function writeToGitHub(appointments: Appointment[], sha: string): Promise<
 async function sendDiscordNotification(apt: Appointment) {
   if (!DISCORD_WEBHOOK) return;
   try {
-    const pkgPrices: Record<string, number> = { standard: 100, deluxe: 120, premium: 150, "cars-package": 200 };
+    const pkgPrices: Record<string, number> = { standard: 100, deluxe: 150, premium: 200, "cars-package": 400 };
     const price = pkgPrices[apt.package?.toLowerCase()] || 0;
     await fetch(DISCORD_WEBHOOK, {
       method: "POST",
