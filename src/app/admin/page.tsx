@@ -78,10 +78,14 @@ export default function AdminPage() {
   };
 
   const saveEdit = async () => {
-    // In-memory only - update local state
-    setAppointments((prev) => prev.map((a) => a.id === editingId ? { ...a, ...editData } : a));
+    await fetch("/api/appointments", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: editingId, ...editData }),
+    });
     setEditingId(null);
     setEditData({});
+    fetchAppointments();
   };
 
   const exportCSV = () => {
