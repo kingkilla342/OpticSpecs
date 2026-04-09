@@ -9,23 +9,23 @@ import { Camera, AtSign, Award, Aperture, Focus, Clapperboard } from "lucide-rea
 const photographers = [
   {
     name: "Raymond",
-    role: "Lead Photographer & Creative Director",
+    role: "Photographer & Creative Director",
     specialty: "Cinematic Portraits & Brand Photography",
     icon: Aperture,
     image: "/raymond.png",
     description: "Raymond brings a cinematic edge to every frame. Specializing in dramatic lighting, high-fashion portraits, and brand campaigns, his work blends editorial precision with raw emotion. He\u2019s the vision behind Optic Specs.",
     highlights: ["Editorial & fashion photography", "Brand identity shoots", "Music artist visuals", "Prom & luxury car shoots"],
-    instagram: "optic.specs",
+    instagram: "llrymnd",
   },
   {
     name: "Isayah",
-    role: "Senior Photographer",
-    specialty: "Street Photography & Events",
+    role: "Photographer & Cinematic Director",
+    specialty: "Photography & Events",
     icon: Focus,
     image: "/isayah.png",
-    description: "Isayah captures life in motion. From street-style fashion to high-energy events, he has a natural eye for candid moments that tell a story. His raw, documentary-style approach gives every shoot an authentic edge.",
+    description: "Isayah does it all , from cinematic directory , to high-end events shots, he has a natural eye for candid moments that tell a story, His raw, documentary-style approach gives every shoot an authentic edge.   ",
     highlights: ["Event & party photography", "Candid street style", "Urban portrait sessions", "Behind-the-scenes content"],
-    instagram: "optic.specs",
+    instagram: "optic.griz",
   },
   {
     name: "Kav",
@@ -35,7 +35,7 @@ const photographers = [
     image: "/kav.png",
     description: "Kav bridges photography and film. Equally skilled behind the camera for stills and video, he crafts cinematic short films, music videos, and promotional content with a sharp creative eye.",
     highlights: ["Music video production", "Short films & promos", "Dynamic portrait photography", "Video editing & post-production"],
-    instagram: "optic.specs",
+    instagram: "kay_2funny",
   },
 ];
 
