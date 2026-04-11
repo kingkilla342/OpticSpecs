@@ -23,8 +23,8 @@ export default function Footer() {
             <h4 className="text-gold uppercase tracking-[3px] text-xs font-semibold mb-6">Get In Touch</h4>
             <div className="flex flex-col gap-4">
               <a href="https://instagram.com/optic.specs" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-white/40 hover:text-gold text-sm transition-colors duration-300"><AtSign size={16} /> @optic.specs</a>
-              <a href="mailto:contact@opticspecs.com" className="flex items-center gap-3 text-white/40 hover:text-gold text-sm transition-colors duration-300"><Mail size={16} /> contact@opticspecs.com</a>
-              <a href="tel:3476228162" className="flex items-center gap-3 text-white/40 hover:text-gold text-sm transition-colors duration-300"><Phone size={16} /> 347-622-8162</a>
+              <a href="mailto:optic.specsphotography@gmail.com" className="flex items-center gap-3 text-white/40 hover:text-gold text-sm transition-colors duration-300"><Mail size={16} /> optic.specsphotography@gmail.com</a>
+              <a href="tel:6318386393 className="flex items-center gap-3 text-white/40 hover:text-gold text-sm transition-colors duration-300"><Phone size={16} /> 631-838-6393</a>
             </div>
           </div>
         </div>
