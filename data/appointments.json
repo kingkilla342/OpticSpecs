@@ -40,19 +40,5 @@
     "notes": "Two different locations two different days",
     "status": "confirmed",
     "createdAt": "2026-05-08T23:24:38.645Z"
-  },
-  {
-    "id": "1778282979827",
-    "name": "Mayo",
-    "email": "optic.specsphotography@gmail.com",
-    "phone": "9789629045",
-    "date": "2026-05-16",
-    "time": "19:30",
-    "package": "standard",
-    "vehicle": "",
-    "location": "Tanner",
-    "notes": "50$ shoot",
-    "status": "cancelled",
-    "createdAt": "2026-05-08T23:29:39.827Z"
   }
 ]
