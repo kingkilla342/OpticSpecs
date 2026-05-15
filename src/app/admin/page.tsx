@@ -3,7 +3,8 @@ import { useState, useEffect, useMemo } from "react";
 import {
   Lock, LogOut, Calendar, User, Mail, Phone, MapPin, Car, CheckCircle, XCircle, Clock,
   Trash2, FileText, Search, Download, RefreshCw, ChevronDown, ChevronUp, Edit3, Save,
-  X, BarChart3, Users, DollarSign, TrendingUp, Filter, Eye, EyeOff, Settings, Bell
+  X, BarChart3, Users, DollarSign, TrendingUp, Filter, Eye, EyeOff, Settings, Bell,
+  ArrowUpRight, AlertCircle, Package, Activity
 } from "lucide-react";
 
 const ACCESS_CODE = "Optic2026";
@@ -25,6 +26,13 @@ interface Appointment {
 
 const pkgPrices: Record<string, number> = {
   standard: 100, deluxe: 150, premium: 200, "cars-package": 400, "cars package": 400,
+};
+
+const pkgColors: Record<string, string> = {
+  standard: "text-white/60",
+  deluxe: "text-gold",
+  premium: "text-red-light",
+  "cars-package": "text-red-light",
 };
 
 export default function AdminPage() {
@@ -121,7 +129,12 @@ export default function AdminPage() {
     const cancelled = appointments.filter((a) => a.status === "cancelled").length;
     const revenue = appointments.filter((a) => a.status === "completed" || a.status === "confirmed").reduce((sum, a) => sum + (pkgPrices[a.package?.toLowerCase()] || 0), 0);
     const thisWeek = appointments.filter((a) => { const d = new Date(a.createdAt); const now = new Date(); const diff = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24); return diff <= 7; }).length;
-    return { total: appointments.length, pending, confirmed, completed, cancelled, revenue, thisWeek };
+    const upcoming = appointments.filter((a) => {
+      if (a.status === "cancelled") return false;
+      const d = new Date(a.date);
+      return d >= new Date();
+    }).length;
+    return { total: appointments.length, pending, confirmed, completed, cancelled, revenue, thisWeek, upcoming };
   }, [appointments]);
 
   const statusColors: Record<string, string> = {
@@ -131,25 +144,39 @@ export default function AdminPage() {
     completed: "text-gold bg-gold/10 border-gold/20",
   };
 
+  const statusDots: Record<string, string> = {
+    pending: "bg-yellow-400",
+    confirmed: "bg-green-400",
+    cancelled: "bg-red-400",
+    completed: "bg-gold",
+  };
+
   // === LOGIN SCREEN ===
   if (!auth) {
     return (
       <main className="relative min-h-screen flex items-center justify-center px-4" style={{ background: "#050505" }}>
-        <div className="glass rounded-xl p-8 md:p-10 max-w-sm w-full">
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-red to-gold" />
+        <div className="absolute top-1/3 left-1/3 w-[400px] h-[400px] bg-red/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/3 right-1/3 w-[300px] h-[300px] bg-gold/4 rounded-full blur-[120px]" />
+
+        <div className="glass rounded-xl p-8 md:p-10 max-w-sm w-full relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red via-gold to-red" />
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-full glass-gold flex items-center justify-center mx-auto mb-4"><Lock size={24} className="text-gold" /></div>
-            <h1 className="text-2xl gold-text font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Admin Access</h1>
-            <p className="text-white/40 text-sm">Enter your access code</p>
+            <div className="w-16 h-16 rounded-full glass-red flex items-center justify-center mx-auto mb-4">
+              <Lock size={24} className="text-red-light" />
+            </div>
+            <h1 className="text-2xl red-gold-text font-semibold mb-2" style={{ fontFamily: "'Playfair Display', serif" }}>Admin Access</h1>
+            <p className="text-white/40 text-sm">Optic Specs Dashboard</p>
           </div>
           <form onSubmit={handleLogin}>
             <div className="relative">
               <input type={showCode ? "text" : "password"} value={code} onChange={(e) => setCode(e.target.value)} placeholder="Access Code" className="input-dark text-center tracking-[4px] text-lg mb-4 pr-10" />
-              <button type="button" onClick={() => setShowCode(!showCode)} className="absolute right-3 top-3 text-white/30 hover:text-gold transition-colors">
+              <button type="button" onClick={() => setShowCode(!showCode)} className="absolute right-3 top-3 text-white/30 hover:text-red-light transition-colors">
                 {showCode ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
-            {error && <p className="text-red-400 text-xs text-center mb-4">{error}</p>}
-            <button type="submit" className="btn-gold w-full py-3">Enter Dashboard</button>
+            {error && <p className="text-red-400 text-xs text-center mb-4 flex items-center justify-center gap-1"><AlertCircle size={12} /> {error}</p>}
+            <button type="submit" className="btn-red w-full py-3">Enter Dashboard</button>
           </form>
         </div>
       </main>
@@ -159,28 +186,47 @@ export default function AdminPage() {
   // === MAIN DASHBOARD ===
   return (
     <main className="relative min-h-screen" style={{ background: "#050505", fontFamily: "'Outfit', sans-serif" }}>
+      {/* Top Accent */}
+      <div className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-red via-gold to-red z-[60]" />
+
       {/* Top Bar */}
       <div className="glass-strong sticky top-0 z-50 border-b border-gold/10">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg glass-gold flex items-center justify-center"><Settings size={14} className="text-gold" /></div>
+            <div className="w-9 h-9 rounded-lg glass-red flex items-center justify-center">
+              <Activity size={16} className="text-red-light" />
+            </div>
             <div>
-              <h1 className="gold-text text-lg font-semibold leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Optic Specs</h1>
-              <p className="text-white/30 text-[10px] uppercase tracking-[2px]">Admin Panel</p>
+              <h1 className="red-gold-text text-lg font-semibold leading-tight" style={{ fontFamily: "'Playfair Display', serif" }}>Optic Specs</h1>
+              <p className="text-white/30 text-[10px] uppercase tracking-[2px]">Admin Dashboard</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button onClick={fetchAppointments} className={`p-2 rounded glass text-gold/50 hover:text-gold transition-all ${refreshing ? "animate-spin" : ""}`}><RefreshCw size={16} /></button>
-            <button onClick={() => setAuth(false)} className="p-2 rounded glass text-red-400/50 hover:text-red-400 transition-all"><LogOut size={16} /></button>
+          <div className="flex items-center gap-3">
+            {stats.pending > 0 && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full glass-red">
+                <div className="w-2 h-2 rounded-full bg-red-light pulse-dot" />
+                <span className="text-red-light text-[10px] uppercase tracking-[2px]">{stats.pending} Pending</span>
+              </div>
+            )}
+            <button onClick={fetchAppointments} className={`p-2 rounded-lg glass text-gold/60 hover:text-gold hover:bg-gold/5 transition-all ${refreshing ? "animate-spin" : ""}`} title="Refresh">
+              <RefreshCw size={16} />
+            </button>
+            <button onClick={() => setAuth(false)} className="p-2 rounded-lg glass text-red-400/60 hover:text-red-400 hover:bg-red/5 transition-all" title="Logout">
+              <LogOut size={16} />
+            </button>
           </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 pt-4">
-        <div className="flex gap-1 bg-black/40 rounded-lg p-1 w-fit">
+        <div className="flex gap-1 bg-black/50 rounded-xl p-1 w-fit border border-white/[0.03]">
           {([["appointments", "Bookings", Calendar], ["analytics", "Analytics", BarChart3], ["settings", "Settings", Settings]] as const).map(([id, label, Icon]) => (
-            <button key={id} onClick={() => setTab(id as typeof tab)} className={`flex items-center gap-2 px-4 py-2 rounded-md text-xs uppercase tracking-[2px] transition-all ${tab === id ? "bg-gold/15 text-gold" : "text-white/40 hover:text-white/60"}`}>
+            <button key={id} onClick={() => setTab(id as typeof tab)} className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs uppercase tracking-[2px] transition-all duration-300 ${
+              tab === id
+                ? id === "appointments" ? "bg-red/15 text-red-light border border-red/20" : "bg-gold/15 text-gold border border-gold/20"
+                : "text-white/40 hover:text-white/60 border border-transparent"
+            }`}>
               <Icon size={14} /> <span className="hidden sm:inline">{label}</span>
             </button>
           ))}
@@ -192,47 +238,78 @@ export default function AdminPage() {
         {/* === ANALYTICS TAB === */}
         {tab === "analytics" && (
           <div className="space-y-6">
+            {/* Top Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {[
-                { label: "Total Bookings", value: stats.total, icon: Users, color: "text-white" },
-                { label: "This Week", value: stats.thisWeek, icon: TrendingUp, color: "text-blue-400" },
-                { label: "Est. Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "text-green-400" },
-                { label: "Conversion", value: stats.total > 0 ? `${Math.round(((stats.confirmed + stats.completed) / stats.total) * 100)}%` : "0%", icon: BarChart3, color: "text-gold" },
+                { label: "Total Bookings", value: stats.total, icon: Users, color: "text-white", bg: "glass" },
+                { label: "This Week", value: stats.thisWeek, icon: TrendingUp, color: "text-red-light", bg: "glass-red" },
+                { label: "Est. Revenue", value: `$${stats.revenue.toLocaleString()}`, icon: DollarSign, color: "text-green-400", bg: "glass" },
+                { label: "Upcoming", value: stats.upcoming, icon: Calendar, color: "text-gold", bg: "glass-gold" },
               ].map((s) => (
-                <div key={s.label} className="glass rounded-xl p-4 md:p-5">
-                  <div className="flex items-center gap-2 mb-2"><s.icon size={14} className={`${s.color} opacity-60`} /><span className="text-white/40 text-[10px] uppercase tracking-[2px]">{s.label}</span></div>
-                  <p className={`text-2xl md:text-3xl font-bold ${s.color}`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.value}</p>
+                <div key={s.label} className={`${s.bg} rounded-xl p-5 relative overflow-hidden`}>
+                  <div className="flex items-center gap-2 mb-3">
+                    <s.icon size={14} className={`${s.color} opacity-60`} />
+                    <span className="text-white/40 text-[10px] uppercase tracking-[2px]">{s.label}</span>
+                  </div>
+                  <p className={`text-3xl md:text-4xl font-bold ${s.color}`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.value}</p>
                 </div>
               ))}
             </div>
+
+            {/* Status Breakdown */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { label: "Pending", count: stats.pending, color: "text-yellow-400", bg: "bg-yellow-400/10" },
-                { label: "Confirmed", count: stats.confirmed, color: "text-green-400", bg: "bg-green-400/10" },
-                { label: "Completed", count: stats.completed, color: "text-gold", bg: "bg-gold/10" },
-                { label: "Cancelled", count: stats.cancelled, color: "text-red-400", bg: "bg-red-400/10" },
+                { label: "Pending", count: stats.pending, color: "text-yellow-400", bg: "bg-yellow-400" },
+                { label: "Confirmed", count: stats.confirmed, color: "text-green-400", bg: "bg-green-400" },
+                { label: "Completed", count: stats.completed, color: "text-gold", bg: "bg-gold" },
+                { label: "Cancelled", count: stats.cancelled, color: "text-red-400", bg: "bg-red-400" },
               ].map((s) => (
-                <div key={s.label} className="glass rounded-xl p-4 text-center">
+                <div key={s.label} className="glass rounded-xl p-5 text-center group hover:border-gold/15 transition-all">
                   <p className={`text-3xl font-bold ${s.color}`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.count}</p>
                   <p className="text-white/40 text-[10px] uppercase tracking-[2px] mt-1">{s.label}</p>
                   <div className="mt-3 h-2 rounded-full bg-white/5 overflow-hidden">
-                    <div className={`h-full rounded-full ${s.bg} ${s.color}`} style={{ width: `${stats.total > 0 ? (s.count / stats.total) * 100 : 0}%`, background: "currentColor", opacity: 0.4 }} />
+                    <div className={`h-full rounded-full transition-all duration-700`} style={{ width: `${stats.total > 0 ? (s.count / stats.total) * 100 : 0}%`, background: "currentColor", opacity: 0.4 }} />
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Package Breakdown */}
             <div className="glass rounded-xl p-6">
-              <h3 className="text-white/60 text-sm font-medium mb-4">Package Breakdown</h3>
+              <h3 className="text-white/60 text-sm font-medium mb-5 flex items-center gap-2">
+                <Package size={14} className="text-red-light" /> Package Breakdown
+              </h3>
               {["standard", "deluxe", "premium", "cars-package"].map((pkg) => {
                 const count = appointments.filter((a) => a.package?.toLowerCase().replace(/\s/g, "-") === pkg).length;
+                const revenue = count * (pkgPrices[pkg] || 0);
                 return (
-                  <div key={pkg} className="flex items-center gap-4 mb-3">
+                  <div key={pkg} className="flex items-center gap-4 mb-4 group">
                     <span className="text-white/50 text-xs uppercase tracking-[2px] w-28 capitalize">{pkg.replace("-", " ")}</span>
-                    <div className="flex-1 h-3 rounded-full bg-white/5 overflow-hidden"><div className="h-full rounded-full bg-gold/40" style={{ width: `${stats.total > 0 ? (count / stats.total) * 100 : 0}%` }} /></div>
+                    <div className="flex-1 h-3 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-red/60 to-gold/60 transition-all duration-700" style={{ width: `${stats.total > 0 ? (count / stats.total) * 100 : 0}%` }} />
+                    </div>
                     <span className="text-gold text-sm font-medium w-8 text-right">{count}</span>
+                    <span className="text-white/20 text-xs w-16 text-right">${revenue}</span>
                   </div>
                 );
               })}
+            </div>
+
+            {/* Recent Activity */}
+            <div className="glass rounded-xl p-6">
+              <h3 className="text-white/60 text-sm font-medium mb-5 flex items-center gap-2">
+                <Activity size={14} className="text-gold" /> Recent Activity
+              </h3>
+              <div className="space-y-3">
+                {appointments.slice(0, 5).map((apt) => (
+                  <div key={apt.id} className="flex items-center gap-3 py-2 border-b border-white/[0.03] last:border-0">
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${statusDots[apt.status] || "bg-white/30"}`} />
+                    <span className="text-white/70 text-sm flex-1 truncate">{apt.name}</span>
+                    <span className="text-white/30 text-xs capitalize">{apt.package?.replace(/-/g, " ")}</span>
+                    <span className="text-white/20 text-xs">{new Date(apt.createdAt).toLocaleDateString()}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -240,21 +317,34 @@ export default function AdminPage() {
         {/* === SETTINGS TAB === */}
         {tab === "settings" && (
           <div className="max-w-lg space-y-6">
-            <div className="glass rounded-xl p-6">
-              <h3 className="text-white/70 text-sm font-medium mb-4 flex items-center gap-2"><Bell size={14} className="text-gold" /> Quick Actions</h3>
+            <div className="glass rounded-xl p-6 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red via-gold to-red" />
+              <h3 className="text-white/70 text-sm font-medium mb-5 flex items-center gap-2"><Bell size={14} className="text-red-light" /> Quick Actions</h3>
               <div className="space-y-3">
                 <button onClick={exportCSV} className="btn-outline w-full py-3 flex items-center justify-center gap-2 text-xs"><Download size={14} /> Export All Bookings as CSV</button>
-                <button onClick={() => { if (confirm("Mark ALL pending as confirmed?")) { appointments.filter((a) => a.status === "pending").forEach((a) => updateStatus(a.id, "confirmed")); } }} className="btn-outline w-full py-3 flex items-center justify-center gap-2 text-xs"><CheckCircle size={14} /> Confirm All Pending</button>
+                <button onClick={() => { if (confirm("Mark ALL pending as confirmed?")) { appointments.filter((a) => a.status === "pending").forEach((a) => updateStatus(a.id, "confirmed")); } }} className="btn-outline-red w-full py-3 flex items-center justify-center gap-2 text-xs"><CheckCircle size={14} /> Confirm All Pending</button>
                 <button onClick={fetchAppointments} className="btn-outline w-full py-3 flex items-center justify-center gap-2 text-xs"><RefreshCw size={14} /> Refresh Data</button>
               </div>
             </div>
             <div className="glass rounded-xl p-6">
-              <h3 className="text-white/70 text-sm font-medium mb-4 flex items-center gap-2"><Settings size={14} className="text-gold" /> Info</h3>
-              <div className="space-y-2 text-sm text-white/40">
-                <p>Admin Code: <span className="text-gold">Optic2026</span></p>
-                <p>Total Records: <span className="text-white/60">{appointments.length}</span></p>
-                <p>Storage: <span className="text-white/60">In-memory (resets on deploy)</span></p>
-                <p className="text-white/20 text-xs mt-4">To persist data permanently, connect a database like Supabase or Firebase.</p>
+              <h3 className="text-white/70 text-sm font-medium mb-4 flex items-center gap-2"><Settings size={14} className="text-gold" /> System Info</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between py-2 border-b border-white/[0.03]">
+                  <span className="text-white/40">Admin Code</span>
+                  <span className="text-gold font-mono">Optic2026</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-white/[0.03]">
+                  <span className="text-white/40">Total Records</span>
+                  <span className="text-white/60">{appointments.length}</span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-white/[0.03]">
+                  <span className="text-white/40">Storage</span>
+                  <span className="text-white/60">GitHub API</span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-white/40">Status</span>
+                  <span className="text-green-400 flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-green-400" /> Online</span>
+                </div>
               </div>
             </div>
           </div>
@@ -266,13 +356,17 @@ export default function AdminPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               {[
-                { label: "Total", count: stats.total, color: "text-white/80" },
-                { label: "Pending", count: stats.pending, color: "text-yellow-400" },
-                { label: "Confirmed", count: stats.confirmed, color: "text-green-400" },
-                { label: "Completed", count: stats.completed, color: "text-gold" },
-                { label: "Cancelled", count: stats.cancelled, color: "text-red-400" },
+                { label: "Total", count: stats.total, color: "text-white/80", active: filter === "all" },
+                { label: "Pending", count: stats.pending, color: "text-yellow-400", active: filter === "pending" },
+                { label: "Confirmed", count: stats.confirmed, color: "text-green-400", active: filter === "confirmed" },
+                { label: "Completed", count: stats.completed, color: "text-gold", active: filter === "completed" },
+                { label: "Cancelled", count: stats.cancelled, color: "text-red-400", active: filter === "cancelled" },
               ].map((s) => (
-                <div key={s.label} className="glass rounded-lg p-3 text-center cursor-pointer hover:border-gold/20 transition-all" onClick={() => setFilter(s.label.toLowerCase() === "total" ? "all" : s.label.toLowerCase())}>
+                <div
+                  key={s.label}
+                  className={`glass rounded-xl p-3 text-center cursor-pointer transition-all duration-300 ${s.active ? "border-red/30 red-glow" : "hover:border-gold/20"}`}
+                  onClick={() => setFilter(s.label.toLowerCase() === "total" ? "all" : s.label.toLowerCase())}
+                >
                   <p className={`text-xl font-bold ${s.color}`} style={{ fontFamily: "'Playfair Display', serif" }}>{s.count}</p>
                   <p className="text-white/30 text-[10px] uppercase tracking-[2px]">{s.label}</p>
                 </div>
@@ -301,88 +395,103 @@ export default function AdminPage() {
                   <option value="name-asc">Name A-Z</option>
                   <option value="name-desc">Name Z-A</option>
                 </select>
-                <button onClick={exportCSV} className="glass px-3 py-2.5 rounded text-gold/60 hover:text-gold transition-all" title="Export CSV"><Download size={16} /></button>
+                <button onClick={exportCSV} className="glass px-3 py-2.5 rounded-lg text-gold/60 hover:text-gold hover:bg-gold/5 transition-all" title="Export CSV"><Download size={16} /></button>
               </div>
             </div>
 
             {/* Appointments List */}
             {filtered.length === 0 ? (
-              <div className="glass rounded-xl p-12 text-center"><p className="text-white/30">No appointments found.</p></div>
+              <div className="glass rounded-xl p-16 text-center">
+                <Calendar size={32} className="text-white/10 mx-auto mb-3" />
+                <p className="text-white/30">No appointments found.</p>
+              </div>
             ) : (
               <div className="space-y-3">
-                {filtered.map((apt) => (
-                  <div key={apt.id} className={`glass rounded-xl overflow-hidden transition-all duration-300 ${expandedId === apt.id ? "border-gold/25" : "hover:border-gold/10"}`}>
-                    {/* Collapsed Row */}
-                    <div className="p-4 flex items-center gap-3 cursor-pointer" onClick={() => setExpandedId(expandedId === apt.id ? null : apt.id)}>
-                      <div className={`w-2 h-2 rounded-full shrink-0 ${apt.status === "pending" ? "bg-yellow-400" : apt.status === "confirmed" ? "bg-green-400" : apt.status === "completed" ? "bg-gold" : "bg-red-400"}`} />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-white font-medium text-sm truncate">{apt.name}</span>
-                          <span className={`text-[10px] uppercase tracking-[2px] px-2 py-0.5 rounded-full border ${statusColors[apt.status] || "text-white/40"}`}>{apt.status}</span>
-                        </div>
-                        <p className="text-white/30 text-xs mt-0.5">{apt.date} &middot; <span className="capitalize">{apt.package?.replace(/-/g, " ")}</span></p>
-                      </div>
-                      {expandedId === apt.id ? <ChevronUp size={16} className="text-white/30" /> : <ChevronDown size={16} className="text-white/30" />}
-                    </div>
-
-                    {/* Expanded Details */}
-                    {expandedId === apt.id && (
-                      <div className="px-4 pb-4 border-t border-white/5 pt-4">
-                        {editingId === apt.id ? (
-                          // Edit Mode
-                          <div className="space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Name</label><input className="input-dark text-sm" value={editData.name || ""} onChange={(e) => setEditData({ ...editData, name: e.target.value })} /></div>
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Email</label><input className="input-dark text-sm" value={editData.email || ""} onChange={(e) => setEditData({ ...editData, email: e.target.value })} /></div>
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Phone</label><input className="input-dark text-sm" value={editData.phone || ""} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} /></div>
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Package</label>
-                                <select className="input-dark text-sm" value={editData.package || ""} onChange={(e) => setEditData({ ...editData, package: e.target.value })}>
-                                  <option value="standard">Standard</option><option value="deluxe">Deluxe</option><option value="premium">Premium</option><option value="cars-package">Cars Package</option>
-                                </select>
-                              </div>
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Date</label><input type="date" className="input-dark text-sm" value={editData.date || ""} onChange={(e) => setEditData({ ...editData, date: e.target.value })} /></div>
-                              <div><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Time</label><input type="time" className="input-dark text-sm" value={editData.time || ""} onChange={(e) => setEditData({ ...editData, time: e.target.value })} /></div>
-                              <div className="md:col-span-2"><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Location</label><input className="input-dark text-sm" value={editData.location || ""} onChange={(e) => setEditData({ ...editData, location: e.target.value })} /></div>
-                              <div className="md:col-span-2"><label className="text-[10px] text-gold uppercase tracking-[2px] block mb-1">Notes</label><textarea className="input-dark text-sm resize-none" rows={3} value={editData.notes || ""} onChange={(e) => setEditData({ ...editData, notes: e.target.value })} /></div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button onClick={saveEdit} className="btn-gold py-2 px-4 text-xs flex items-center gap-1"><Save size={12} /> Save</button>
-                              <button onClick={() => { setEditingId(null); setEditData({}); }} className="btn-outline py-2 px-4 text-xs flex items-center gap-1"><X size={12} /> Cancel</button>
-                            </div>
+                {filtered.map((apt) => {
+                  const isUpcoming = new Date(apt.date) >= new Date() && apt.status !== "cancelled";
+                  return (
+                    <div key={apt.id} className={`glass rounded-xl overflow-hidden transition-all duration-300 ${expandedId === apt.id ? "border-red/25 red-glow" : "hover:border-gold/10"}`}>
+                      {/* Collapsed Row */}
+                      <div className="p-4 flex items-center gap-3 cursor-pointer" onClick={() => setExpandedId(expandedId === apt.id ? null : apt.id)}>
+                        <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${statusDots[apt.status] || "bg-white/30"} ${apt.status === "pending" ? "pulse-dot" : ""}`} />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-white font-medium text-sm truncate">{apt.name}</span>
+                            <span className={`text-[10px] uppercase tracking-[2px] px-2 py-0.5 rounded-full border ${statusColors[apt.status] || "text-white/40"}`}>{apt.status}</span>
+                            {isUpcoming && <span className="text-[9px] uppercase tracking-[2px] px-2 py-0.5 rounded-full bg-red/10 text-red-light border border-red/20">Upcoming</span>}
                           </div>
-                        ) : (
-                          // View Mode
-                          <>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm mb-4">
-                              <div className="flex items-center gap-2 text-white/50"><Mail size={13} className="text-gold/50 shrink-0" /> <span className="truncate">{apt.email}</span></div>
-                              <div className="flex items-center gap-2 text-white/50"><Phone size={13} className="text-gold/50 shrink-0" /> {apt.phone}</div>
-                              <div className="flex items-center gap-2 text-white/50"><Calendar size={13} className="text-gold/50 shrink-0" /> {apt.date} at {apt.time}</div>
-                              <div className="flex items-center gap-2 text-white/50"><User size={13} className="text-gold/50 shrink-0" /> <span className="capitalize">{apt.package?.replace(/-/g, " ")}</span></div>
-                              {apt.vehicle && <div className="flex items-center gap-2 text-white/50"><Car size={13} className="text-gold/50 shrink-0" /> <span className="capitalize">{apt.vehicle.replace(/-/g, " ")}</span></div>}
-                              {apt.location && <div className="flex items-center gap-2 text-white/50"><MapPin size={13} className="text-gold/50 shrink-0" /> {apt.location}</div>}
-                            </div>
-                            {apt.notes && (
-                              <div className="mb-4 p-3 rounded-lg bg-white/[0.02] border border-white/5">
-                                <p className="text-gold/50 text-[10px] uppercase tracking-[2px] mb-1 flex items-center gap-1"><FileText size={10} /> Client Notes</p>
-                                <p className="text-white/50 text-sm">{apt.notes}</p>
-                              </div>
-                            )}
-                            <p className="text-white/20 text-xs mb-4">Booked: {new Date(apt.createdAt).toLocaleString()}</p>
-
-                            {/* Action Buttons */}
-                            <div className="flex flex-wrap gap-2">
-                              <button onClick={() => updateStatus(apt.id, "confirmed")} className="flex items-center gap-1.5 px-3 py-1.5 rounded glass text-green-400/70 hover:text-green-400 hover:bg-green-400/10 text-xs transition-all"><CheckCircle size={13} /> Confirm</button>
-                              <button onClick={() => updateStatus(apt.id, "completed")} className="flex items-center gap-1.5 px-3 py-1.5 rounded glass text-gold/70 hover:text-gold hover:bg-gold/10 text-xs transition-all"><Clock size={13} /> Complete</button>
-                              <button onClick={() => updateStatus(apt.id, "cancelled")} className="flex items-center gap-1.5 px-3 py-1.5 rounded glass text-red-400/70 hover:text-red-400 hover:bg-red-400/10 text-xs transition-all"><XCircle size={13} /> Cancel</button>
-                              <button onClick={() => startEdit(apt)} className="flex items-center gap-1.5 px-3 py-1.5 rounded glass text-blue-400/70 hover:text-blue-400 hover:bg-blue-400/10 text-xs transition-all"><Edit3 size={13} /> Edit</button>
-                              <button onClick={() => deleteAppointment(apt.id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded glass text-red-400/70 hover:text-red-400 hover:bg-red-500/10 text-xs transition-all ml-auto"><Trash2 size={13} /> Delete</button>
-                            </div>
-                          </>
-                        )}
+                          <div className="flex items-center gap-3 mt-0.5">
+                            <p className="text-white/30 text-xs">{apt.date} at {apt.time}</p>
+                            <span className="text-white/15">·</span>
+                            <p className={`text-xs capitalize ${pkgColors[apt.package?.toLowerCase()] || "text-white/30"}`}>{apt.package?.replace(/-/g, " ")}</p>
+                            {apt.vehicle && <>
+                              <span className="text-white/15">·</span>
+                              <p className="text-gold/50 text-xs flex items-center gap-1"><Car size={10} /> Vehicle</p>
+                            </>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-gold/60 text-sm font-medium hidden sm:block">${pkgPrices[apt.package?.toLowerCase()] || 0}</span>
+                          {expandedId === apt.id ? <ChevronUp size={16} className="text-red-light/50" /> : <ChevronDown size={16} className="text-white/30" />}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                ))}
+
+                      {/* Expanded Details */}
+                      {expandedId === apt.id && (
+                        <div className="px-4 pb-4 border-t border-white/5 pt-4">
+                          {editingId === apt.id ? (
+                            <div className="space-y-3">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Name</label><input className="input-dark text-sm" value={editData.name || ""} onChange={(e) => setEditData({ ...editData, name: e.target.value })} /></div>
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Email</label><input className="input-dark text-sm" value={editData.email || ""} onChange={(e) => setEditData({ ...editData, email: e.target.value })} /></div>
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Phone</label><input className="input-dark text-sm" value={editData.phone || ""} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} /></div>
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Package</label>
+                                  <select className="input-dark text-sm" value={editData.package || ""} onChange={(e) => setEditData({ ...editData, package: e.target.value })}>
+                                    <option value="standard">Standard</option><option value="deluxe">Deluxe</option><option value="premium">Premium</option><option value="cars-package">Cars Package</option>
+                                  </select>
+                                </div>
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Date</label><input type="date" className="input-dark text-sm" value={editData.date || ""} onChange={(e) => setEditData({ ...editData, date: e.target.value })} /></div>
+                                <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Time</label><input type="time" className="input-dark text-sm" value={editData.time || ""} onChange={(e) => setEditData({ ...editData, time: e.target.value })} /></div>
+                                <div className="md:col-span-2"><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Location</label><input className="input-dark text-sm" value={editData.location || ""} onChange={(e) => setEditData({ ...editData, location: e.target.value })} /></div>
+                                <div className="md:col-span-2"><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Notes</label><textarea className="input-dark text-sm resize-none" rows={3} value={editData.notes || ""} onChange={(e) => setEditData({ ...editData, notes: e.target.value })} /></div>
+                              </div>
+                              <div className="flex gap-2">
+                                <button onClick={saveEdit} className="btn-red py-2 px-5 text-xs flex items-center gap-1"><Save size={12} /> Save Changes</button>
+                                <button onClick={() => { setEditingId(null); setEditData({}); }} className="btn-outline py-2 px-5 text-xs flex items-center gap-1"><X size={12} /> Cancel</button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-sm mb-4">
+                                <div className="flex items-center gap-2 text-white/50"><Mail size={13} className="text-red-light/50 shrink-0" /> <span className="truncate">{apt.email}</span></div>
+                                <div className="flex items-center gap-2 text-white/50"><Phone size={13} className="text-red-light/50 shrink-0" /> {apt.phone}</div>
+                                <div className="flex items-center gap-2 text-white/50"><Calendar size={13} className="text-gold/50 shrink-0" /> {apt.date} at {apt.time}</div>
+                                <div className="flex items-center gap-2 text-white/50"><User size={13} className="text-gold/50 shrink-0" /> <span className="capitalize">{apt.package?.replace(/-/g, " ")}</span> — <span className="text-gold">${pkgPrices[apt.package?.toLowerCase()] || 0}</span></div>
+                                {apt.vehicle && <div className="flex items-center gap-2 text-white/50"><Car size={13} className="text-red-light/50 shrink-0" /> <span className="capitalize">{apt.vehicle.replace(/-/g, " ")}</span></div>}
+                                {apt.location && <div className="flex items-center gap-2 text-white/50"><MapPin size={13} className="text-gold/50 shrink-0" /> {apt.location}</div>}
+                              </div>
+                              {apt.notes && (
+                                <div className="mb-4 p-3 rounded-lg bg-white/[0.02] border border-red/10">
+                                  <p className="text-red-light/50 text-[10px] uppercase tracking-[2px] mb-1 flex items-center gap-1"><FileText size={10} /> Client Notes</p>
+                                  <p className="text-white/50 text-sm">{apt.notes}</p>
+                                </div>
+                              )}
+                              <p className="text-white/20 text-xs mb-4">Booked: {new Date(apt.createdAt).toLocaleString()}</p>
+
+                              <div className="flex flex-wrap gap-2">
+                                <button onClick={() => updateStatus(apt.id, "confirmed")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-green-400/70 hover:text-green-400 hover:bg-green-400/10 text-xs transition-all"><CheckCircle size={13} /> Confirm</button>
+                                <button onClick={() => updateStatus(apt.id, "completed")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-gold/70 hover:text-gold hover:bg-gold/10 text-xs transition-all"><Clock size={13} /> Complete</button>
+                                <button onClick={() => updateStatus(apt.id, "cancelled")} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-red-400/70 hover:text-red-400 hover:bg-red-400/10 text-xs transition-all"><XCircle size={13} /> Cancel</button>
+                                <button onClick={() => startEdit(apt)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-blue-400/70 hover:text-blue-400 hover:bg-blue-400/10 text-xs transition-all"><Edit3 size={13} /> Edit</button>
+                                <button onClick={() => deleteAppointment(apt.id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg glass text-red-400/70 hover:text-red-400 hover:bg-red-500/10 text-xs transition-all ml-auto"><Trash2 size={13} /> Delete</button>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
