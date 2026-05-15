@@ -5,7 +5,7 @@ import FadeIn from "@/components/FadeIn";
 import SectionHeading from "@/components/SectionHeading";
 import Image from "next/image";
 import Link from "next/link";
-import { Camera, AtSign, Award, Aperture, Focus, Clapperboard, Instagram } from "lucide-react";
+import { Camera, AtSign, Award, Aperture, Focus, Clapperboard } from "lucide-react";
 
 const photographers = [
   {
@@ -95,7 +95,7 @@ export default function PhotographersPage() {
                           className="absolute bottom-3 left-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          <Instagram size={11} className="text-white/60" />
+                          <AtSign size={11} className="text-white/60" />
                           <span className="text-white/60 text-[9px] tracking-[1px]">@{p.instagram}</span>
                         </a>
                       </div>

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Instagram, Mail, Phone } from "lucide-react";
+import { AtSign, Mail, Phone } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -52,7 +52,7 @@ export default function Footer() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 text-white/30 hover:text-red-light text-sm transition-colors duration-300 group"
               >
-                <Instagram size={15} className="shrink-0 group-hover:scale-110 transition-transform duration-300" />
+                <AtSign size={15} className="shrink-0 group-hover:scale-110 transition-transform duration-300" />
                 <span>@optic.specs</span>
               </a>
               <a
