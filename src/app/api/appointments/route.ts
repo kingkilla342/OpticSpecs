@@ -111,18 +111,25 @@ async function sendWeb3FormsNotification(apt: Appointment) {
       `Submitted: ${new Date().toLocaleString()}`,
     ].filter(Boolean).join("\n");
 
-    await fetch("https://api.web3forms.com/submit", {
+    const res = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         access_key: WEB3FORMS_KEY,
-        subject: `New Booking: ${apt.name} \u2014 ${(apt.package || "").replace(/-/g, " ").toUpperCase()}`,
+        subject: `New Booking: ${apt.name} - ${(apt.package || "").replace(/-/g, " ").toUpperCase()}`,
         from_name: "Optic Specs Bookings",
         message: lines,
         name: apt.name,
         email: apt.email,
+        botcheck: false,
       }),
     });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      console.error("Web3Forms error:", res.status, data);
+    } else {
+      console.log("Web3Forms notification sent:", data.message);
+    }
   } catch (err) {
     console.error("Web3Forms notification failed:", err);
   }
@@ -155,7 +162,7 @@ export async function POST(request: NextRequest) {
     appointments.push(newAppointment);
     const saved = await writeToGitHub(appointments, sha);
     if (!saved) return NextResponse.json({ error: "Failed to save to GitHub" }, { status: 500 });
-    sendWeb3FormsNotification(newAppointment);
+    await sendWeb3FormsNotification(newAppointment);
     return NextResponse.json({ success: true, appointment: newAppointment });
   } catch (err) {
     console.error("POST error:", err);
