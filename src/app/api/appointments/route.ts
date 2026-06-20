@@ -98,35 +98,33 @@ async function sendWeb3FormsNotification(apt: Appointment) {
   try {
     const pkgPrices: Record<string, number> = { standard: 100, deluxe: 150, premium: 200, "cars-package": 400 };
     const price = pkgPrices[apt.package?.toLowerCase()] || 0;
-    const lines = [
-      `Client: ${apt.name}`,
-      `Email: ${apt.email}`,
-      `Phone: ${apt.phone}`,
-      `Package: ${(apt.package || "").replace(/-/g, " ").toUpperCase()} ($${price})`,
-      `Date: ${apt.date}`,
-      `Time: ${apt.time}`,
-      `Location: ${apt.location || "Not specified"}`,
-      apt.vehicle ? `Vehicle: ${apt.vehicle.replace(/-/g, " ")}` : null,
-      apt.notes ? `Notes: ${apt.notes}` : null,
-      `Submitted: ${new Date().toLocaleString()}`,
-    ].filter(Boolean).join("\n");
+    const pkg = (apt.package || "").replace(/-/g, " ").toUpperCase();
+
+    const payload: Record<string, string> = {
+      access_key: WEB3FORMS_KEY,
+      subject: `New Booking: ${apt.name} - ${pkg}`,
+      from_name: "Optic Specs Bookings",
+      name: apt.name,
+      email: apt.email,
+      phone: apt.phone,
+      package: `${pkg} ($${price})`,
+      date: apt.date,
+      time: apt.time,
+      location: apt.location || "Not specified",
+      message: `New booking from ${apt.name} for ${pkg} on ${apt.date} at ${apt.time}.`,
+    };
+
+    if (apt.vehicle) payload.vehicle = apt.vehicle.replace(/-/g, " ");
+    if (apt.notes) payload.notes = apt.notes;
 
     const res = await fetch("https://api.web3forms.com/submit", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        access_key: WEB3FORMS_KEY,
-        subject: `New Booking: ${apt.name} - ${(apt.package || "").replace(/-/g, " ").toUpperCase()}`,
-        from_name: "Optic Specs Bookings",
-        message: lines,
-        name: apt.name,
-        email: apt.email,
-        botcheck: false,
-      }),
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
     if (!res.ok || !data.success) {
-      console.error("Web3Forms error:", res.status, data);
+      console.error("Web3Forms error:", res.status, JSON.stringify(data));
     } else {
       console.log("Web3Forms notification sent:", data.message);
     }
