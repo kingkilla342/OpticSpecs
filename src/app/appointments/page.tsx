@@ -57,7 +57,13 @@ function AppointmentForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (res.ok) setSubmitted(true);
+      if (res.status === 429) {
+        alert("Too many requests. Please wait a few minutes before submitting again.");
+      } else if (res.ok) {
+        setSubmitted(true);
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
     } catch {
       alert("Something went wrong. Please try again.");
     } finally {

@@ -2,8 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 const GITHUB_REPO = process.env.GITHUB_REPO || "";
-const DISCORD_WEBHOOK = process.env.DISCORD_WEBHOOK_URL || "";
+const WEB3FORMS_KEY = "9d040882-512d-4d6d-865e-5cb8d5ed471e";
 const DATA_PATH = "data/appointments.json";
+
+// Rate limiting: max 3 submissions per IP per 15 minutes
+const rateLimitMap = new Map<string, number[]>();
+const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+
+function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(ip) || [];
+  const recent = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+  if (recent.length >= RATE_LIMIT_MAX) return false;
+  rateLimitMap.set(ip, [...recent, now]);
+  return true;
+}
 
 interface Appointment {
   id: string;
@@ -72,37 +94,37 @@ async function writeToGitHub(appointments: Appointment[], sha: string): Promise<
   }
 }
 
-async function sendDiscordNotification(apt: Appointment) {
-  if (!DISCORD_WEBHOOK) return;
+async function sendWeb3FormsNotification(apt: Appointment) {
   try {
     const pkgPrices: Record<string, number> = { standard: 100, deluxe: 150, premium: 200, "cars-package": 400 };
     const price = pkgPrices[apt.package?.toLowerCase()] || 0;
-    await fetch(DISCORD_WEBHOOK, {
+    const lines = [
+      `Client: ${apt.name}`,
+      `Email: ${apt.email}`,
+      `Phone: ${apt.phone}`,
+      `Package: ${(apt.package || "").replace(/-/g, " ").toUpperCase()} ($${price})`,
+      `Date: ${apt.date}`,
+      `Time: ${apt.time}`,
+      `Location: ${apt.location || "Not specified"}`,
+      apt.vehicle ? `Vehicle: ${apt.vehicle.replace(/-/g, " ")}` : null,
+      apt.notes ? `Notes: ${apt.notes}` : null,
+      `Submitted: ${new Date().toLocaleString()}`,
+    ].filter(Boolean).join("\n");
+
+    await fetch("https://api.web3forms.com/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: "Optic Specs Bookings",
-        embeds: [{
-          title: "\ud83c\udfaf New Booking Received!",
-          color: 0xd4a94c,
-          fields: [
-            { name: "\ud83d\udc64 Client", value: apt.name || "N/A", inline: true },
-            { name: "\ud83d\udce7 Email", value: apt.email || "N/A", inline: true },
-            { name: "\ud83d\udcf1 Phone", value: apt.phone || "N/A", inline: true },
-            { name: "\ud83d\udce6 Package", value: `${(apt.package || "N/A").replace(/-/g, " ").toUpperCase()} ($${price})`, inline: true },
-            { name: "\ud83d\udcc5 Date", value: apt.date || "N/A", inline: true },
-            { name: "\u23f0 Time", value: apt.time || "N/A", inline: true },
-            { name: "\ud83d\udccd Location", value: apt.location || "Not specified", inline: false },
-            ...(apt.vehicle ? [{ name: "\ud83d\ude97 Vehicle", value: apt.vehicle.replace(/-/g, " "), inline: false }] : []),
-            ...(apt.notes ? [{ name: "\ud83d\udcdd Notes", value: apt.notes, inline: false }] : []),
-          ],
-          footer: { text: "Optic Specs \u2022 Go to /admin to manage" },
-          timestamp: new Date().toISOString(),
-        }],
+        access_key: WEB3FORMS_KEY,
+        subject: `New Booking: ${apt.name} \u2014 ${(apt.package || "").replace(/-/g, " ").toUpperCase()}`,
+        from_name: "Optic Specs Bookings",
+        message: lines,
+        name: apt.name,
+        email: apt.email,
       }),
     });
   } catch (err) {
-    console.error("Discord notification failed:", err);
+    console.error("Web3Forms notification failed:", err);
   }
 }
 
@@ -112,6 +134,14 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a few minutes before submitting again." },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const { appointments, sha } = await readFromGitHub();
@@ -125,7 +155,7 @@ export async function POST(request: NextRequest) {
     appointments.push(newAppointment);
     const saved = await writeToGitHub(appointments, sha);
     if (!saved) return NextResponse.json({ error: "Failed to save to GitHub" }, { status: 500 });
-    sendDiscordNotification(newAppointment);
+    sendWeb3FormsNotification(newAppointment);
     return NextResponse.json({ success: true, appointment: newAppointment });
   } catch (err) {
     console.error("POST error:", err);
