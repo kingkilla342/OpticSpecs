@@ -9,7 +9,7 @@ import { Check, Car, Crown, ArrowRight, Gem } from "lucide-react";
 const packages = [
   {
     name: "Standard",
-    price: 100,
+    price: 200,
     popular: false,
     accent: "gold",
     features: [
@@ -22,7 +22,7 @@ const packages = [
   },
   {
     name: "Deluxe",
-    price: 150,
+    price: 300,
     popular: true,
     accent: "red",
     features: [
@@ -35,7 +35,7 @@ const packages = [
   },
   {
     name: "Premium",
-    price: 200,
+    price: 400,
     popular: false,
     accent: "gold",
     features: [
