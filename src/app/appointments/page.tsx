@@ -8,9 +8,9 @@ import SectionHeading from "@/components/SectionHeading";
 import { Calendar, Clock, MapPin, Send, CheckCircle, Loader2 } from "lucide-react";
 
 const packageOptions = [
-  { value: "standard", label: "Standard – $100", price: 100 },
-  { value: "deluxe", label: "Deluxe – $150", price: 150 },
-  { value: "premium", label: "Premium – $200", price: 200 },
+  { value: "standard", label: "Standard – $200", price: 200 },
+  { value: "deluxe", label: "Deluxe – $300", price: 300 },
+  { value: "premium", label: "Premium – $400", price: 400 },
   { value: "cars-package", label: "Cars Package – $400", price: 400 },
 ];
 
