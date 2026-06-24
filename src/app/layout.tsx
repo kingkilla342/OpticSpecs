@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Optic Specs | Professional Photography & Videography",
-  description: "Luxury photography and videography services. Professional prom shoots, brand photography, cinematic videos, and exotic car packages.",
+  description: "Luxury photography and videography services. Professional prom shoots, brand photography, and cinematic videos.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

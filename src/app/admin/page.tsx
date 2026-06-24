@@ -25,14 +25,13 @@ interface Appointment {
 }
 
 const pkgPrices: Record<string, number> = {
-  standard: 100, deluxe: 150, premium: 200, "cars-package": 400, "cars package": 400,
+  standard: 200, deluxe: 300, premium: 400,
 };
 
 const pkgColors: Record<string, string> = {
   standard: "text-white/60",
   deluxe: "text-gold",
   premium: "text-red-light",
-  "cars-package": "text-red-light",
 };
 
 export default function AdminPage() {
@@ -279,7 +278,7 @@ export default function AdminPage() {
               <h3 className="text-white/60 text-sm font-medium mb-5 flex items-center gap-2">
                 <Package size={14} className="text-red-light" /> Package Breakdown
               </h3>
-              {["standard", "deluxe", "premium", "cars-package"].map((pkg) => {
+              {["standard", "deluxe", "premium"].map((pkg) => {
                 const count = appointments.filter((a) => a.package?.toLowerCase().replace(/\s/g, "-") === pkg).length;
                 const revenue = count * (pkgPrices[pkg] || 0);
                 return (
@@ -447,7 +446,7 @@ export default function AdminPage() {
                                 <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Phone</label><input className="input-dark text-sm" value={editData.phone || ""} onChange={(e) => setEditData({ ...editData, phone: e.target.value })} /></div>
                                 <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Package</label>
                                   <select className="input-dark text-sm" value={editData.package || ""} onChange={(e) => setEditData({ ...editData, package: e.target.value })}>
-                                    <option value="standard">Standard</option><option value="deluxe">Deluxe</option><option value="premium">Premium</option><option value="cars-package">Cars Package</option>
+                                    <option value="standard">Standard</option><option value="deluxe">Deluxe</option><option value="premium">Premium</option>
                                   </select>
                                 </div>
                                 <div><label className="text-[10px] text-red-light uppercase tracking-[2px] block mb-1">Date</label><input type="date" className="input-dark text-sm" value={editData.date || ""} onChange={(e) => setEditData({ ...editData, date: e.target.value })} /></div>

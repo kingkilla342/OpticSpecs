@@ -96,7 +96,7 @@ async function writeToGitHub(appointments: Appointment[], sha: string): Promise<
 
 async function sendWeb3FormsNotification(apt: Appointment) {
   try {
-    const pkgPrices: Record<string, number> = { standard: 200, deluxe: 300, premium: 400, "cars-package": 400 };
+    const pkgPrices: Record<string, number> = { standard: 200, deluxe: 300, premium: 400 };
     const price = pkgPrices[apt.package?.toLowerCase()] || 0;
     const pkg = (apt.package || "").replace(/-/g, " ").toUpperCase();
 

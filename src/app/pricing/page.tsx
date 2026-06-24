@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import FadeIn from "@/components/FadeIn";
 import SectionHeading from "@/components/SectionHeading";
 import Link from "next/link";
-import { Check, Car, Crown, ArrowRight, Gem } from "lucide-react";
+import { Check, Crown, ArrowRight, Gem } from "lucide-react";
 
 const packages = [
   {
@@ -42,21 +42,6 @@ const packages = [
       "Up to 3 hours of shooting",
       "Multiple locations of your choice",
       "30–40 edited photos",
-      "Outfit changes, props & concept planning",
-      "Priority editing (3–4 business days)",
-      "Perfect for brand shoots, music artists, or cinematic portraits",
-    ],
-  },
-  {
-    name: "Cars Package",
-    price: 400,
-    popular: false,
-    accent: "red",
-    icon: Car,
-    features: [
-      "Multiple locations of your choice",
-      "Car of your choosing from our fleet",
-      "50–70 edited photos",
       "Outfit changes, props & concept planning",
       "Priority editing (3–4 business days)",
       "Perfect for brand shoots, music artists, or cinematic portraits",

@@ -11,7 +11,6 @@ const packageOptions = [
   { value: "standard", label: "Standard – $200", price: 200 },
   { value: "deluxe", label: "Deluxe – $300", price: 300 },
   { value: "premium", label: "Premium – $400", price: 400 },
-  { value: "cars-package", label: "Cars Package – $400", price: 400 },
 ];
 
 const DEPOSIT_RATE = 0.3;

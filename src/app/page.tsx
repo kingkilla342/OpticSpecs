@@ -12,7 +12,6 @@ const services = [
   { icon: Video, title: "Videography", desc: "Full video production from concept to final cut — music videos, promos, events, and more.", accent: "gold" },
   { icon: Palette, title: "Photo Editing", desc: "High-end retouching, color grading, and post-processing that transforms every frame.", accent: "red" },
   { icon: Film, title: "Video Editing", desc: "Professional editing with motion graphics, color correction, and sound design.", accent: "gold" },
-  { icon: Car, title: "Exotic Car Packages", desc: "30+ luxury vehicles available for your shoot — Rolls Royce, Lamborghini, Ferrari, and more.", accent: "red" },
   { icon: Sparkles, title: "Creative Direction", desc: "Full concept planning, styling guidance, and artistic direction for unforgettable results.", accent: "gold" },
 ];
 
@@ -76,7 +75,7 @@ export default function Home() {
 
           <FadeIn delay={0.55}>
             <p className="text-white/45 max-w-xl mx-auto text-base md:text-lg mb-10 leading-relaxed font-light">
-              Professional photography, videography, and full creative production. Luxury car packages available. Every frame, a masterpiece.
+              Professional photography, videography, and full creative production. Every frame, a masterpiece.
             </p>
           </FadeIn>
 
