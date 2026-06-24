@@ -144,11 +144,17 @@ export default function PricingPage() {
                     {pkg.name}
                   </h3>
 
-                  <div className="flex items-baseline gap-1 mb-6">
+                  <div className="flex items-baseline gap-1 mb-2">
                     <span className={`text-4xl font-bold ${pkg.accent === "red" ? "red-text" : "gold-text"}`} style={{ fontFamily: "'Playfair Display', serif" }}>
                       ${pkg.price}
                     </span>
                     <span className="text-white/20 text-xs">/session</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 mb-6">
+                    <div className="w-1 h-1 rounded-full bg-gold/50" />
+                    <span className="text-gold/60 text-[10px] uppercase tracking-[2px]">
+                      ${Math.round(pkg.price * 0.3)} deposit to confirm
+                    </span>
                   </div>
 
                   <div className="red-gold-line mb-6" />
@@ -210,8 +216,9 @@ export default function PricingPage() {
               </div>
 
               {/* Table footer */}
-              <div className="px-8 py-5 border-t border-white/[0.04] bg-gradient-to-r from-gold/[0.03] to-transparent">
+              <div className="px-8 py-5 border-t border-white/[0.04] bg-gradient-to-r from-gold/[0.03] to-transparent flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <p className="text-white/20 text-xs tracking-wide">Prices are in addition to your photography package.</p>
+                <p className="text-gold/40 text-[10px] uppercase tracking-[2px]">30% deposit required to confirm all bookings</p>
               </div>
             </div>
           </FadeIn>

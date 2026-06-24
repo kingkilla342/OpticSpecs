@@ -14,6 +14,8 @@ const packageOptions = [
   { value: "cars-package", label: "Cars Package – $400", price: 400 },
 ];
 
+const DEPOSIT_RATE = 0.3;
+
 const vehicleOptions = [
   { value: "", label: "No vehicle needed" },
   { value: "mercedes-g63-blue", label: "2024 Mercedes G63 – China Blue ($600)" },
@@ -71,15 +73,23 @@ function AppointmentForm() {
     }
   };
 
+  const selectedPkg = packageOptions.find((p) => p.value === form.package);
+  const depositAmount = selectedPkg ? Math.round(selectedPkg.price * DEPOSIT_RATE) : 0;
+
   if (submitted) {
     return (
       <FadeIn>
         <div className="glass-red rounded-xl p-12 text-center max-w-lg mx-auto relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-red via-gold to-red" />
           <CheckCircle size={56} className="text-red-light mx-auto mb-6" />
-          <h2 className="text-3xl red-gold-text font-semibold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Booking Confirmed</h2>
-          <p className="text-white/50 mb-2">Thank you, <span className="text-gold">{form.name}</span>!</p>
-          <p className="text-white/40 text-sm">We&apos;ll reach out within 24 hours to finalize your session details. Check your email for a confirmation.</p>
+          <h2 className="text-3xl red-gold-text font-semibold mb-4" style={{ fontFamily: "'Playfair Display', serif" }}>Request Received</h2>
+          <p className="text-white/50 mb-4">Thank you, <span className="text-gold">{form.name}</span>!</p>
+          <div className="glass rounded-lg px-6 py-4 mb-4">
+            <p className="text-gold text-xs uppercase tracking-[3px] mb-1">Deposit Required</p>
+            <p className="text-white text-2xl font-bold" style={{ fontFamily: "'Playfair Display', serif" }}>${depositAmount}</p>
+            <p className="text-white/30 text-xs mt-1">30% of {selectedPkg?.label}</p>
+          </div>
+          <p className="text-white/40 text-sm">We&apos;ll reach out within 24 hours with deposit instructions to confirm your session.</p>
         </div>
       </FadeIn>
     );
@@ -137,8 +147,17 @@ function AppointmentForm() {
             <textarea name="notes" value={form.notes} onChange={handleChange} rows={4} placeholder="Tell us about your vision, outfit ideas, concept plans, or any modifications to your selected package..." className="input-dark resize-none" />
           </div>
         </div>
-        <button type="submit" disabled={loading} className="btn-red w-full mt-8 py-4 flex items-center justify-center gap-2 disabled:opacity-50">
-          {loading ? <Loader2 size={18} className="animate-spin" /> : <><Send size={14} /> Confirm Booking</>}
+        <div className="mt-8 glass rounded-lg px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-white/30 text-[10px] uppercase tracking-[2px] mb-0.5">Deposit to Confirm</p>
+            <p className="text-gold font-semibold text-lg" style={{ fontFamily: "'Playfair Display', serif" }}>
+              ${depositAmount} <span className="text-white/25 text-xs font-normal">/ 30% of {selectedPkg?.label ?? "package"}</span>
+            </p>
+          </div>
+          <p className="text-white/20 text-xs max-w-[180px] text-right leading-relaxed">Balance due on shoot day</p>
+        </div>
+        <button type="submit" disabled={loading} className="btn-red w-full mt-4 py-4 flex items-center justify-center gap-2 disabled:opacity-50">
+          {loading ? <Loader2 size={18} className="animate-spin" /> : <><Send size={14} /> Request Booking</>}
         </button>
       </form>
     </FadeIn>

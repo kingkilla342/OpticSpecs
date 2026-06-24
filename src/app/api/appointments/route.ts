@@ -100,6 +100,7 @@ async function sendWeb3FormsNotification(apt: Appointment) {
     const price = pkgPrices[apt.package?.toLowerCase()] || 0;
     const pkg = (apt.package || "").replace(/-/g, " ").toUpperCase();
 
+    const deposit = Math.round(price * 0.3);
     const payload: Record<string, string> = {
       access_key: WEB3FORMS_KEY,
       subject: `New Booking: ${apt.name} - ${pkg}`,
@@ -108,10 +109,12 @@ async function sendWeb3FormsNotification(apt: Appointment) {
       email: apt.email,
       phone: apt.phone,
       package: `${pkg} ($${price})`,
+      deposit_required: `$${deposit} (30%)`,
+      balance_due: `$${price - deposit} (on shoot day)`,
       date: apt.date,
       time: apt.time,
       location: apt.location || "Not specified",
-      message: `New booking from ${apt.name} for ${pkg} on ${apt.date} at ${apt.time}.`,
+      message: `New booking from ${apt.name} for ${pkg} on ${apt.date} at ${apt.time}. Deposit required: $${deposit}.`,
     };
 
     if (apt.vehicle) payload.vehicle = apt.vehicle.replace(/-/g, " ");
